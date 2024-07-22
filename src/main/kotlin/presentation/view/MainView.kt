@@ -17,12 +17,13 @@ import presentation.composables.*
 fun MainView(
     modifier: Modifier = Modifier,
     courses: List<Course>,
+    selectedIndex: Int,
     rowsSubtitle: String,
     columnsSubtitle: String,
     onEditRowsClicked: () -> Unit,
     onEditColumnsClicked: () -> Unit,
     onAddSubjectClicked: () -> Unit,
-    onSubjectSelected: (Int) -> Unit
+    onSubjectSelected: (Int) -> Unit,
 ) {
     Column(modifier.padding(8.dp)) {
         Title("Table format")
@@ -42,7 +43,9 @@ fun MainView(
                 ClickableCard(
                     title = courses[index].name,
                     subtitle = "${courses[index].courseSchedule.size} schedules",
-                    onClick = { onSubjectSelected(index) })
+                    onClick = { onSubjectSelected(index) },
+                    isSelected = index == selectedIndex
+                )
             }
         }
     }

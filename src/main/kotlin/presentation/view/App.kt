@@ -36,6 +36,7 @@ fun App() {
         Row {
             MainView(Modifier.width(300.dp).fillMaxHeight().background(Color.White),
                 courses = list,
+                selectedIndex = selectedCourseIndex,
                 rowsSubtitle = rows.joinToString(", "),
                 columnsSubtitle = columns.joinToString(", "),
                 onEditRowsClicked = { openEditRowsDialog = true },

@@ -1,4 +1,4 @@
-package composables
+package presentation.composables
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogWindow
 
 @Composable
-fun TextInputDialog(onCloseRequest: () -> Unit, title: String, labelText: String, buttonText: String, onInputReceived: (String) -> Unit, initialInput: String = "") {
+fun TextInputDialog(onCloseRequest: () -> Unit, title: String,  buttonText: String, onInputReceived: (String) -> Unit, labelText: String = "", initialInput: String = "") {
     DialogWindow(
         onCloseRequest = onCloseRequest, title = title) {
         Column(modifier = Modifier.fillMaxSize().padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {

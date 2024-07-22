@@ -1,4 +1,4 @@
-package composables
+package presentation.composables
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width

@@ -1,4 +1,4 @@
-package composables
+package presentation.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -12,19 +12,23 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogWindow
+import androidx.compose.ui.unit.sp
+import data.Course
+import presentation.composables.AddButton
+import presentation.composables.TableCell
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun EditSubjectDialog(onCloseRequest: () -> Unit, title: String, onNewSchedule: (String) -> Unit, onNewSubjectName: (String) -> Unit) {
-    DialogWindow(
-        onCloseRequest = onCloseRequest, title = title) {
-        Column(Modifier.padding(16.dp)) {
+fun DetailView(modifier: Modifier = Modifier, course: Course?, onEditCourseNameClicked: () -> Unit) {
+    Column(modifier.padding(horizontal = 8.dp)) {
+        course?.let {
             Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
                 AddButton(onClick = {}, text = "Add schedule")
                 Spacer(Modifier.width(8.dp))
-                EditButton(onClick = {}, text = "Edit name")
+                EditButton(onClick = onEditCourseNameClicked, text = "Edit name")
             }
             FlowRow(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()), horizontalArrangement = Arrangement.Center) {
                 repeat(5) {
@@ -32,6 +36,15 @@ fun EditSubjectDialog(onCloseRequest: () -> Unit, title: String, onNewSchedule: 
                 }
             }
         }
+            ?: run {
+                Text(
+                    modifier = Modifier.fillMaxSize().wrapContentHeight(),
+                    text = "No course selected",
+                    textAlign = TextAlign.Center,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
+                )
+            }
     }
 }
 

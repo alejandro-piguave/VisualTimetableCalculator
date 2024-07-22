@@ -5,10 +5,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun Title(title: String, modifier: Modifier = Modifier, ) {
-    Text(title, modifier = modifier.padding(8.dp), fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+fun Title(title: String, modifier: Modifier = Modifier, textAlign: TextAlign? = null) {
+    Text(title, modifier = modifier.padding(8.dp), fontWeight = FontWeight.SemiBold, fontSize = 18.sp, textAlign = textAlign)
 }

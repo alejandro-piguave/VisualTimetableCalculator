@@ -3,6 +3,7 @@ package presentation.view
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
@@ -22,12 +23,19 @@ import presentation.composables.TableCell
 import presentation.composables.Title
 
 @Composable
-fun DetailView(modifier: Modifier = Modifier, course: Course, onEditCourseNameClicked: () -> Unit, onAddScheduleClicked: () -> Unit) {
+fun DetailView(
+    course: Course,
+    selectedScheduleIndex: Int,
+    onEditCourseNameClicked: () -> Unit,
+    onAddScheduleClicked: () -> Unit,
+    onScheduleClicked: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(modifier) {
         DetailTopBar(course.name, onEditCourseNameClicked, onAddScheduleClicked)
         Spacer(Modifier.height(8.dp))
         Title("Schedules", modifier = Modifier.padding(horizontal = 8.dp))
-        ScheduleList(course.courseSchedules)
+        ScheduleList(course.courseSchedules, selectedScheduleIndex, onScheduleClicked)
     }
 }
 
@@ -45,30 +53,32 @@ fun DetailTopBar(title: String, onEditCourseNameClicked: () -> Unit, onAddSchedu
         })
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ScheduleList(schedules: List<CourseSchedule>) {
-    if(schedules.isEmpty()) {
-        Text("No schedules created",
+fun ScheduleList(schedules: List<CourseSchedule>, selectedScheduleIndex: Int, onScheduleClicked: (Int) -> Unit) {
+    if (schedules.isEmpty()) {
+        Text(
+            "No schedules created",
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
-            fontSize = 16.sp)
+            fontSize = 16.sp
+        )
     } else {
-        FlowRow(
+        LazyRow(
             modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.Center
         ) {
-            repeat(schedules.size) { index ->
-                TimetableItem(schedules[index].classroom, 6, 5, onClick = {})
+            items(schedules.size) { index ->
+                TimetableItem(schedules[index].classroomName, 6, 5, onClick = { onScheduleClicked(index) }, isSelected = index == selectedScheduleIndex)
             }
         }
     }
 }
 
 @Composable
-fun TimetableItem(name: String, rows: Int, columns: Int, onClick: () -> Unit) {
+fun TimetableItem(name: String, rows: Int, columns: Int, onClick: () -> Unit, isSelected: Boolean = false) {
     Card(
         Modifier.padding(4.dp).clickable(onClick = onClick),
+        backgroundColor = if (isSelected) Color(0xffCCCCFF) else MaterialTheme.colors.surface,
         elevation = 4.dp
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(12.dp)) {

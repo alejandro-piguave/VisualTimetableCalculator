@@ -36,6 +36,7 @@ fun App() {
         var openAddScheduleDialog by remember { mutableStateOf(false) }
 
         var selectedCourseIndex by remember { mutableStateOf(-1) }
+        var selectedScheduleIndex by remember { mutableStateOf(-1) }
 
         Row {
             MainView(Modifier.width(300.dp).fillMaxHeight().background(Color.White),
@@ -51,11 +52,16 @@ fun App() {
 
             Column {
                 list.getOrNull(selectedCourseIndex)?.let { selectedCourse ->
-                    DetailView(Modifier.weight(1f).fillMaxHeight(), selectedCourse,
+                    DetailView(selectedCourse,
+                        selectedScheduleIndex,
                         onEditCourseNameClicked = { openEditCourseNameDialog = true },
                         onAddScheduleClicked = { openAddScheduleDialog = true },
+                        onScheduleClicked = { selectedScheduleIndex = it }
                     )
-                    TimetableView(rows, columns, modifier = Modifier.weight(1f))
+
+                    selectedCourse.courseSchedules.getOrNull(selectedScheduleIndex)?.let { selectedSchedule ->
+                        TimetableView(selectedSchedule.classroomName, rows, columns, modifier = Modifier.weight(1f))
+                    }
                 } ?: run {
                     EmptyDetailView()
                 }
@@ -93,7 +99,7 @@ fun App() {
         if(openAddScheduleDialog) {
             TextInputDialog(onCloseRequest = { openAddScheduleDialog = false }, title = "Add course schedule", labelText = "Classroom name", buttonText = "Add", onInputReceived = {
                 val currentCourse = list[selectedCourseIndex]
-                list[selectedCourseIndex] = currentCourse.copy(courseSchedules = currentCourse.courseSchedules + CourseSchedule(classroom = it, emptyList()))
+                list[selectedCourseIndex] = currentCourse.copy(courseSchedules = currentCourse.courseSchedules + CourseSchedule(classroomName = it, emptyList()))
                 openAddScheduleDialog = false
             })
         }

@@ -2,15 +2,18 @@ package presentation.view
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import data.Course
+import data.CourseSchedule
 import presentation.composables.EditItemsListWindow
 import presentation.composables.TextInputDialog
 
@@ -30,6 +33,7 @@ fun App() {
         var openEditRowsDialog by remember { mutableStateOf(false) }
         var openEditColumnsDialog by remember { mutableStateOf(false) }
         var openEditCourseNameDialog by remember { mutableStateOf(false) }
+        var openAddScheduleDialog by remember { mutableStateOf(false) }
 
         var selectedCourseIndex by remember { mutableStateOf(-1) }
 
@@ -45,7 +49,17 @@ fun App() {
                 onSubjectSelected = { selectedCourseIndex = it }
             )
 
-            DetailView(Modifier.weight(1f).fillMaxHeight(), list.getOrNull(selectedCourseIndex), onEditCourseNameClicked = { openEditCourseNameDialog = true })
+            Column {
+                list.getOrNull(selectedCourseIndex)?.let { selectedCourse ->
+                    DetailView(Modifier.weight(1f).fillMaxHeight(), selectedCourse,
+                        onEditCourseNameClicked = { openEditCourseNameDialog = true },
+                        onAddScheduleClicked = { openAddScheduleDialog = true },
+                    )
+                    TimetableView(rows, columns, modifier = Modifier.weight(1f))
+                } ?: run {
+                    EmptyDetailView()
+                }
+            }
         }
 
         if(openEditRowsDialog){
@@ -75,5 +89,24 @@ fun App() {
                 openEditCourseNameDialog = false
             })
         }
+
+        if(openAddScheduleDialog) {
+            TextInputDialog(onCloseRequest = { openAddScheduleDialog = false }, title = "Add course schedule", labelText = "Classroom name", buttonText = "Add", onInputReceived = {
+                val currentCourse = list[selectedCourseIndex]
+                list[selectedCourseIndex] = currentCourse.copy(courseSchedules = currentCourse.courseSchedules + CourseSchedule(classroom = it, emptyList()))
+                openAddScheduleDialog = false
+            })
+        }
     }
+}
+
+@Composable
+fun EmptyDetailView() {
+    Text(
+        modifier = Modifier.fillMaxSize().wrapContentHeight(),
+        text = "No course selected",
+        textAlign = TextAlign.Center,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Medium,
+    )
 }

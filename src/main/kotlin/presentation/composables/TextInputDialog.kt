@@ -29,7 +29,7 @@ fun TextInputDialog(onCloseRequest: () -> Unit, title: String,  buttonText: Stri
                 onValueChange = { subjectName = it}
             )
 
-            Button(onClick = { onInputReceived(subjectName) }, modifier = Modifier.fillMaxWidth()) {
+            Button(onClick = { if(subjectName.isNotBlank()) onInputReceived(subjectName) }, modifier = Modifier.fillMaxWidth()) {
                 Icon(Icons.Default.Add, null)
                 Spacer(Modifier.width(4.dp))
                 Text(buttonText)

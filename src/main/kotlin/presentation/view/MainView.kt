@@ -42,7 +42,7 @@ fun MainView(
             items(courses.size) { index ->
                 ClickableCard(
                     title = courses[index].name,
-                    subtitle = "${courses[index].courseSchedule.size} schedules",
+                    subtitle = "${courses[index].courseSchedules.size} schedules",
                     onClick = { onSubjectSelected(index) },
                     isSelected = index == selectedIndex
                 )

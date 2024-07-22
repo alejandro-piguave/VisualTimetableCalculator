@@ -16,23 +16,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogWindow
 
 @Composable
-fun AddSubjectDialog(onCloseRequest: () -> Unit, onAddNewSubject: (String) -> Unit) {
+fun TextInputDialog(onCloseRequest: () -> Unit, title: String, labelText: String, buttonText: String, onInputReceived: (String) -> Unit, initialInput: String = "") {
     DialogWindow(
-        onCloseRequest = onCloseRequest, title = "Add a new subject") {
+        onCloseRequest = onCloseRequest, title = title) {
         Column(modifier = Modifier.fillMaxSize().padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            var subjectName by remember { mutableStateOf("") }
+            var subjectName by remember { mutableStateOf(initialInput) }
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = subjectName,
-                label = { Text("Subject name") },
+                label = { Text(labelText) },
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                 onValueChange = { subjectName = it}
             )
 
-            Button(onClick = { onAddNewSubject(subjectName) }, modifier = Modifier.fillMaxWidth()) {
+            Button(onClick = { onInputReceived(subjectName) }, modifier = Modifier.fillMaxWidth()) {
                 Icon(Icons.Default.Add, null)
                 Spacer(Modifier.width(4.dp))
-                Text("Add")
+                Text(buttonText)
             }
         }
     }

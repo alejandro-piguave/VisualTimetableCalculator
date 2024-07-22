@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -37,15 +36,12 @@ fun ItemsList(modifier: Modifier = Modifier, items: List<String>, onAdd: (String
                     label = { Text("New row name") },
                     onValueChange = { rowName = it },
                 )
-                Button(modifier = Modifier.fillParentMaxWidth(), onClick = {
+                AddButton(text = "Add item", modifier = Modifier.fillParentMaxWidth(), onClick = {
                     if(rowName.isNotBlank()){
                         onAdd(rowName)
                         rowName = ""
                     }
-                }) {
-                    Icon(Icons.Filled.Add, contentDescription = "")
-                    Text("Add")
-                }
+                })
             }
         }
 

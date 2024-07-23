@@ -12,10 +12,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import data.Course
-import data.CourseSchedule
 import presentation.composables.EditItemsListWindow
 import presentation.composables.TextInputDialog
+import presentation.state.CourseState
+import presentation.state.ScheduleState
+import presentation.utils.getCellIndex
 
 val defaultColumns = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
 val defaultRows = listOf("9:00-11:00", "11:00-13:00", "13:00-15:00", "15:00-17:00", "17:00-19:00", "19:00-21:00")
@@ -27,7 +28,7 @@ fun App() {
         val rows = remember { mutableStateListOf<String>().apply { addAll(defaultRows) } }
         val columns = remember { mutableStateListOf<String>().apply { addAll(defaultColumns) } }
 
-        val list = remember { mutableStateListOf<Course>() }
+        val courses = remember { mutableStateListOf<CourseState>() }
 
         var openAddSubjectDialog by remember { mutableStateOf(false) }
         var openEditRowsDialog by remember { mutableStateOf(false) }
@@ -40,7 +41,7 @@ fun App() {
 
         Row {
             MainView(Modifier.width(300.dp).fillMaxHeight().background(Color.White),
-                courses = list,
+                courses = courses,
                 selectedIndex = selectedCourseIndex,
                 rowsSubtitle = rows.joinToString(", "),
                 columnsSubtitle = columns.joinToString(", "),
@@ -51,7 +52,7 @@ fun App() {
             )
 
             Column {
-                list.getOrNull(selectedCourseIndex)?.let { selectedCourse ->
+                courses.getOrNull(selectedCourseIndex)?.let { selectedCourse ->
                     DetailView(selectedCourse,
                         selectedScheduleIndex,
                         onEditCourseNameClicked = { openEditCourseNameDialog = true },
@@ -59,8 +60,12 @@ fun App() {
                         onScheduleClicked = { selectedScheduleIndex = it }
                     )
 
-                    selectedCourse.courseSchedules.getOrNull(selectedScheduleIndex)?.let { selectedSchedule ->
-                        TimetableView(selectedSchedule.classroomName, rows, columns, modifier = Modifier.weight(1f))
+                    selectedCourse.scheduleStates.getOrNull(selectedScheduleIndex)?.let { selectedSchedule ->
+                        TimetableView(selectedSchedule, selectedCourse.name, rows, columns, onCellClicked = { row, column ->
+                            val cellIndex = getCellIndex(row, column, columns.size)
+                            val cellValue = selectedSchedule.cells[cellIndex] ?: false
+                            selectedSchedule.cells[cellIndex] = !cellValue
+                        }, modifier = Modifier.weight(1f))
                     }
                 } ?: run {
                     EmptyDetailView()
@@ -84,22 +89,21 @@ fun App() {
         }
         if(openAddSubjectDialog) {
             TextInputDialog(onCloseRequest = { openAddSubjectDialog = false }, title = "Add a new subject", labelText = "Subject name", buttonText = "Add", onInputReceived = {
-                list.add(Course(it, emptyList()))
+                courses.add(CourseState(it))
                 openAddSubjectDialog = false
             })
         }
 
         if(openEditCourseNameDialog) {
-            TextInputDialog(onCloseRequest = { openEditCourseNameDialog = false }, title = "Edit course name", labelText = "Course name", initialInput = list[selectedCourseIndex].name, buttonText = "Edit", onInputReceived = {
-                list[selectedCourseIndex] = list[selectedCourseIndex].copy(name = it)
+            TextInputDialog(onCloseRequest = { openEditCourseNameDialog = false }, title = "Edit course name", labelText = "Course name", initialInput = courses[selectedCourseIndex].name, buttonText = "Edit", onInputReceived = {
+                courses[selectedCourseIndex] = courses[selectedCourseIndex].copy(name = it)
                 openEditCourseNameDialog = false
             })
         }
 
         if(openAddScheduleDialog) {
             TextInputDialog(onCloseRequest = { openAddScheduleDialog = false }, title = "Add course schedule", labelText = "Classroom name", buttonText = "Add", onInputReceived = {
-                val currentCourse = list[selectedCourseIndex]
-                list[selectedCourseIndex] = currentCourse.copy(courseSchedules = currentCourse.courseSchedules + CourseSchedule(classroomName = it, emptyList()))
+                courses[selectedCourseIndex].scheduleStates.add(ScheduleState(classroomName = it))
                 openAddScheduleDialog = false
             })
         }

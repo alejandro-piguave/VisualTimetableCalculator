@@ -6,20 +6,21 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import data.Course
-import presentation.composables.*
+import presentation.composables.ArrowCard
+import presentation.composables.Title
+import presentation.selectedItemColor
+import presentation.state.CourseState
 
 @Composable
 fun MainView(
     modifier: Modifier = Modifier,
-    courses: List<Course>,
+    courses: List<CourseState>,
     selectedIndex: Int,
     rowsSubtitle: String,
     columnsSubtitle: String,
@@ -45,7 +46,7 @@ fun MainView(
             items(courses.size) { index ->
                 CourseItem(
                     title = courses[index].name,
-                    subtitle = "${courses[index].courseSchedules.size} schedules",
+                    subtitle = "${courses[index].scheduleStates.size} schedules",
                     onClick = { onSubjectSelected(index) },
                     isSelected = index == selectedIndex
                 )
@@ -64,7 +65,7 @@ fun CourseItem(
 ) {
     Card(
         modifier.padding(8.dp).fillMaxWidth().then(if(isSelected) Modifier else Modifier.clickable(onClick = onClick)),
-        backgroundColor = if (isSelected) Color(0xffCCCCFF) else MaterialTheme.colors.surface,
+        backgroundColor = if (isSelected) selectedItemColor else MaterialTheme.colors.surface,
         elevation = 8.dp
     ) {
         Row(

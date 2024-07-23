@@ -17,14 +17,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import data.Course
-import data.CourseSchedule
 import presentation.composables.TableCell
 import presentation.composables.Title
+import presentation.selectedItemColor
+import presentation.state.CourseState
+import presentation.state.ScheduleState
 
 @Composable
 fun DetailView(
-    course: Course,
+    course: CourseState,
     selectedScheduleIndex: Int,
     onEditCourseNameClicked: () -> Unit,
     onAddScheduleClicked: () -> Unit,
@@ -35,7 +36,7 @@ fun DetailView(
         DetailTopBar(course.name, onEditCourseNameClicked, onAddScheduleClicked)
         Spacer(Modifier.height(8.dp))
         Title("Schedules", modifier = Modifier.padding(horizontal = 8.dp))
-        ScheduleList(course.courseSchedules, selectedScheduleIndex, onScheduleClicked)
+        ScheduleList(course.scheduleStates.toList(), selectedScheduleIndex, onScheduleClicked)
     }
 }
 
@@ -54,7 +55,7 @@ fun DetailTopBar(title: String, onEditCourseNameClicked: () -> Unit, onAddSchedu
 }
 
 @Composable
-fun ScheduleList(schedules: List<CourseSchedule>, selectedScheduleIndex: Int, onScheduleClicked: (Int) -> Unit) {
+fun ScheduleList(schedules: List<ScheduleState>, selectedScheduleIndex: Int, onScheduleClicked: (Int) -> Unit) {
     if (schedules.isEmpty()) {
         Text(
             "No schedules created",
@@ -78,7 +79,7 @@ fun ScheduleList(schedules: List<CourseSchedule>, selectedScheduleIndex: Int, on
 fun TimetableItem(name: String, rows: Int, columns: Int, onClick: () -> Unit, isSelected: Boolean = false) {
     Card(
         Modifier.padding(4.dp).clickable(onClick = onClick),
-        backgroundColor = if (isSelected) Color(0xffCCCCFF) else MaterialTheme.colors.surface,
+        backgroundColor = if (isSelected) selectedItemColor else MaterialTheme.colors.surface,
         elevation = 4.dp
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(12.dp)) {

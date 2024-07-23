@@ -18,7 +18,7 @@ import presentation.selectedItemColor
 import presentation.state.CourseState
 
 @Composable
-fun MainView(
+fun SideBarView(
     modifier: Modifier = Modifier,
     courses: List<CourseState>,
     selectedIndex: Int,
@@ -28,9 +28,10 @@ fun MainView(
     onEditColumnsClicked: () -> Unit,
     onAddSubjectClicked: () -> Unit,
     onSubjectSelected: (Int) -> Unit,
+    onCalculateTimetablesClicked: () -> Unit
 ) {
-    Column(modifier.padding(8.dp)) {
-        Title("Table format")
+    Column(modifier.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Title("Table format", modifier = Modifier.fillMaxWidth())
         ArrowCard(title = "Edit rows", subtitle = rowsSubtitle, onClick = onEditRowsClicked)
         ArrowCard(title = "Edit columns", subtitle = columnsSubtitle, onClick = onEditColumnsClicked)
 
@@ -42,7 +43,7 @@ fun MainView(
             }
         }
 
-        LazyColumn(Modifier.fillMaxWidth()) {
+        LazyColumn(Modifier.fillMaxWidth().weight(1f)) {
             items(courses.size) { index ->
                 CourseItem(
                     title = courses[index].name,
@@ -51,6 +52,10 @@ fun MainView(
                     isSelected = index == selectedIndex
                 )
             }
+        }
+
+        Button(onClick = onCalculateTimetablesClicked, enabled = courses.isNotEmpty()) {
+            Text("Calculate timetables", modifier = Modifier.padding(8.dp))
         }
     }
 }

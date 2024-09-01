@@ -7,10 +7,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import data.CourseClassRoom
+import data.TimetableCell
 
 @Composable
-fun Timetable(rows: List<String>, columns: List<String>, schedule: List<List<CourseClassRoom?>>, modifier: Modifier = Modifier) {
+fun TimetableEditView(rows: List<String>, columns: List<String>, schedule: List<List<TimetableCell?>>, modifier: Modifier = Modifier) {
     Column(modifier.fillMaxSize().padding(16.dp)) {
         Row(Modifier.background(Color.Gray).height(intrinsicSize = IntrinsicSize.Max)) {
             TableCell("", weight = 1f)

@@ -1,5 +1,5 @@
 package presentation.utils
 
-fun getCellIndex(row: Int, column: Int, columns: Int): Int {
-    return row * columns + column
+fun getCellIndex(hour: Int, day: Int, days: Int): Int {
+    return hour * days + day
 }

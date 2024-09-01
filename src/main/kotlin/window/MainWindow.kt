@@ -13,11 +13,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
+import data.semester.firstSemester
 import presentation.composables.EditItemsListWindow
 import presentation.composables.TextInputDialog
 import presentation.state.CourseState
 import presentation.state.ScheduleState
 import presentation.utils.getCellIndex
+import presentation.utils.toState
 import presentation.view.DetailView
 import presentation.view.SideBarView
 import presentation.view.TimetableView
@@ -26,13 +28,13 @@ import presentation.view.TimetableView
 @Composable
 @Preview
 fun MainWindow(
-    rows: List<String>, columns: List<String>,
+    hours: List<String>, days: List<String>,
     onAddRow: (String) -> Unit, onRemoveRowAt: (Int) -> Unit,
     onAddColumn: (String) -> Unit, onRemoveColumnAt: (Int) -> Unit,
-    onCloseRequest: () -> Unit, onShowResult: () -> Unit) {
+    onCloseRequest: () -> Unit, onCalculate: (hours: Int, days: Int, courses: List<CourseState>) -> Unit) {
     Window(onCloseRequest = onCloseRequest, title = "Timetable Calculator") {
         MaterialTheme {
-            val courses = remember { mutableStateListOf<CourseState>() }
+            val courses = remember { mutableStateListOf<CourseState>().apply { addAll(firstSemester.toState(days.size)) } }
 
             var openAddSubjectDialog by remember { mutableStateOf(false) }
             var openEditRowsDialog by remember { mutableStateOf(false) }
@@ -48,13 +50,15 @@ fun MainWindow(
                     Modifier.width(300.dp).fillMaxHeight().background(Color.White),
                     courses = courses,
                     selectedIndex = selectedCourseIndex,
-                    rowsSubtitle = rows.joinToString(", "),
-                    columnsSubtitle = columns.joinToString(", "),
+                    rowsSubtitle = hours.joinToString(", "),
+                    columnsSubtitle = days.joinToString(", "),
                     onEditRowsClicked = { openEditRowsDialog = true },
                     onEditColumnsClicked = { openEditColumnsDialog = true },
                     onAddSubjectClicked = { openAddSubjectDialog = true },
                     onSubjectSelected = { selectedCourseIndex = it },
-                    onCalculateTimetablesClicked = onShowResult
+                    onCalculateTimetablesClicked = {
+                        onCalculate(hours.size, days.size, courses)
+                    }
                 )
 
                 Column {
@@ -70,10 +74,10 @@ fun MainWindow(
                             TimetableView(
                                 selectedSchedule,
                                 selectedCourse.name,
-                                rows,
-                                columns,
+                                hours,
+                                days,
                                 onCellClicked = { row, column ->
-                                    val cellIndex = getCellIndex(row, column, columns.size)
+                                    val cellIndex = getCellIndex(row, column, days.size)
                                     val cellValue = selectedSchedule.cells[cellIndex] ?: false
                                     selectedSchedule.cells[cellIndex] = !cellValue
                                 },
@@ -90,7 +94,7 @@ fun MainWindow(
                 EditItemsListWindow(
                     onCloseRequest = { openEditRowsDialog = false },
                     title = "Edit rows",
-                    items = rows,
+                    items = hours,
                     onAddNewItem = onAddRow,
                     onDeleteAt = onRemoveRowAt)
             }
@@ -98,7 +102,7 @@ fun MainWindow(
                 EditItemsListWindow(
                     onCloseRequest = { openEditColumnsDialog = false },
                     title = "Edit columns",
-                    items = columns,
+                    items = days,
                     onAddNewItem = onAddColumn,
                     onDeleteAt = onRemoveColumnAt)
             }

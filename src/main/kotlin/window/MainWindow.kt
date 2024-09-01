@@ -22,17 +22,16 @@ import presentation.view.DetailView
 import presentation.view.SideBarView
 import presentation.view.TimetableView
 
-val defaultColumns = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
-val defaultRows = listOf("9:00-11:00", "11:00-13:00", "13:00-15:00", "15:00-17:00", "17:00-19:00", "19:00-21:00")
 
 @Composable
 @Preview
-fun MainWindow(onCloseRequest: () -> Unit, onShowResult: () -> Unit) {
+fun MainWindow(
+    rows: List<String>, columns: List<String>,
+    onAddRow: (String) -> Unit, onRemoveRowAt: (Int) -> Unit,
+    onAddColumn: (String) -> Unit, onRemoveColumnAt: (Int) -> Unit,
+    onCloseRequest: () -> Unit, onShowResult: () -> Unit) {
     Window(onCloseRequest = onCloseRequest, title = "Timetable Calculator") {
         MaterialTheme {
-            val rows = remember { mutableStateListOf<String>().apply { addAll(defaultRows) } }
-            val columns = remember { mutableStateListOf<String>().apply { addAll(defaultColumns) } }
-
             val courses = remember { mutableStateListOf<CourseState>() }
 
             var openAddSubjectDialog by remember { mutableStateOf(false) }
@@ -45,13 +44,14 @@ fun MainWindow(onCloseRequest: () -> Unit, onShowResult: () -> Unit) {
             var selectedScheduleIndex by remember { mutableStateOf(-1) }
 
             Row {
-                SideBarView(Modifier.width(300.dp).fillMaxHeight().background(Color.White),
+                SideBarView(
+                    Modifier.width(300.dp).fillMaxHeight().background(Color.White),
                     courses = courses,
                     selectedIndex = selectedCourseIndex,
                     rowsSubtitle = rows.joinToString(", "),
                     columnsSubtitle = columns.joinToString(", "),
                     onEditRowsClicked = { openEditRowsDialog = true },
-                    onEditColumnsClicked = { openEditColumnsDialog = true},
+                    onEditColumnsClicked = { openEditColumnsDialog = true },
                     onAddSubjectClicked = { openAddSubjectDialog = true },
                     onSubjectSelected = { selectedCourseIndex = it },
                     onCalculateTimetablesClicked = onShowResult
@@ -67,11 +67,18 @@ fun MainWindow(onCloseRequest: () -> Unit, onShowResult: () -> Unit) {
                         )
 
                         selectedCourse.scheduleStates.getOrNull(selectedScheduleIndex)?.let { selectedSchedule ->
-                            TimetableView(selectedSchedule, selectedCourse.name, rows, columns, onCellClicked = { row, column ->
-                                val cellIndex = getCellIndex(row, column, columns.size)
-                                val cellValue = selectedSchedule.cells[cellIndex] ?: false
-                                selectedSchedule.cells[cellIndex] = !cellValue
-                            }, modifier = Modifier.weight(1f))
+                            TimetableView(
+                                selectedSchedule,
+                                selectedCourse.name,
+                                rows,
+                                columns,
+                                onCellClicked = { row, column ->
+                                    val cellIndex = getCellIndex(row, column, columns.size)
+                                    val cellValue = selectedSchedule.cells[cellIndex] ?: false
+                                    selectedSchedule.cells[cellIndex] = !cellValue
+                                },
+                                modifier = Modifier.weight(1f)
+                            )
                         }
                     } ?: run {
                         EmptyDetailView()
@@ -79,39 +86,57 @@ fun MainWindow(onCloseRequest: () -> Unit, onShowResult: () -> Unit) {
                 }
             }
 
-            if(openEditRowsDialog){
-                EditItemsListWindow(onCloseRequest = { openEditRowsDialog = false }, title = "Edit rows", items = rows, onAddNewItem = {
-                    rows.add(it)
-                }, onDeleteAt = {
-                    rows.removeAt(it)
-                })
+            if (openEditRowsDialog) {
+                EditItemsListWindow(
+                    onCloseRequest = { openEditRowsDialog = false },
+                    title = "Edit rows",
+                    items = rows,
+                    onAddNewItem = onAddRow,
+                    onDeleteAt = onRemoveRowAt)
             }
-            if(openEditColumnsDialog){
-                EditItemsListWindow(onCloseRequest = { openEditColumnsDialog = false }, title = "Edit columns", items = columns, onAddNewItem = {
-                    columns.add(it)
-                }, onDeleteAt = {
-                    columns.removeAt(it)
-                })
+            if (openEditColumnsDialog) {
+                EditItemsListWindow(
+                    onCloseRequest = { openEditColumnsDialog = false },
+                    title = "Edit columns",
+                    items = columns,
+                    onAddNewItem = onAddColumn,
+                    onDeleteAt = onRemoveColumnAt)
             }
-            if(openAddSubjectDialog) {
-                TextInputDialog(onCloseRequest = { openAddSubjectDialog = false }, title = "Add a new subject", labelText = "Subject name", buttonText = "Add", onInputReceived = {
-                    courses.add(CourseState(it))
-                    openAddSubjectDialog = false
-                })
+            if (openAddSubjectDialog) {
+                TextInputDialog(
+                    onCloseRequest = { openAddSubjectDialog = false },
+                    title = "Add a new subject",
+                    labelText = "Subject name",
+                    buttonText = "Add",
+                    onInputReceived = {
+                        courses.add(CourseState(it))
+                        openAddSubjectDialog = false
+                    })
             }
 
-            if(openEditCourseNameDialog) {
-                TextInputDialog(onCloseRequest = { openEditCourseNameDialog = false }, title = "Edit course name", labelText = "Course name", initialInput = courses[selectedCourseIndex].name, buttonText = "Edit", onInputReceived = {
-                    courses[selectedCourseIndex] = courses[selectedCourseIndex].copy(name = it)
-                    openEditCourseNameDialog = false
-                })
+            if (openEditCourseNameDialog) {
+                TextInputDialog(
+                    onCloseRequest = { openEditCourseNameDialog = false },
+                    title = "Edit course name",
+                    labelText = "Course name",
+                    initialInput = courses[selectedCourseIndex].name,
+                    buttonText = "Edit",
+                    onInputReceived = {
+                        courses[selectedCourseIndex] = courses[selectedCourseIndex].copy(name = it)
+                        openEditCourseNameDialog = false
+                    })
             }
 
-            if(openAddScheduleDialog) {
-                TextInputDialog(onCloseRequest = { openAddScheduleDialog = false }, title = "Add course schedule", labelText = "Classroom name", buttonText = "Add", onInputReceived = {
-                    courses[selectedCourseIndex].scheduleStates.add(ScheduleState(classroomName = it))
-                    openAddScheduleDialog = false
-                })
+            if (openAddScheduleDialog) {
+                TextInputDialog(
+                    onCloseRequest = { openAddScheduleDialog = false },
+                    title = "Add course schedule",
+                    labelText = "Classroom name",
+                    buttonText = "Add",
+                    onInputReceived = {
+                        courses[selectedCourseIndex].scheduleStates.add(ScheduleState(classroomName = it))
+                        openAddScheduleDialog = false
+                    })
             }
         }
     }

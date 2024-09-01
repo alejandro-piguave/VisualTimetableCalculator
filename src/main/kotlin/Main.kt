@@ -17,12 +17,6 @@ fun main() = application {
     val mainViewModel = remember { MainViewModel(coroutineScope) }
     val result by mainViewModel.timetables.collectAsState()
 
-    LaunchedEffect(result) {
-        println("launchedEffect ${result}")
-        if (result.isNotEmpty()) {
-            showResult = true
-        }
-    }
     MainWindow(
         onCloseRequest = ::exitApplication,
         hours = rows,
@@ -33,6 +27,7 @@ fun main() = application {
         onRemoveRowAt = { rows.removeAt(it) },
         onCalculate = { hours, days, courses ->
             mainViewModel.calculate(hours, days, courses)
+            showResult = true
         }
     )
     if(showResult && result.isNotEmpty()) {
